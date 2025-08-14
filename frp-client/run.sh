@@ -7,20 +7,24 @@ LOCK_FILE='/tmp/frpc.lock'
 
 bashio::log.info "RUN.SH START $(date)"
 
-# 防止多实例并发启动
-if [[ -f "$LOCK_FILE" ]]; then
-    bashio::log.warning "Another frpc instance is still shutting down. Waiting..."
-    while [[ -f "$LOCK_FILE" ]]; do
+# 停掉旧的 FRPC
+if pgrep -f "frpc -c" >/dev/null; then
+    bashio::log.info "Stopping existing FRPC..."
+    pkill -TERM -f "frpc -c"
+    # 等待退出
+    for i in {1..10}; do
+        if ! pgrep -f "frpc -c" >/dev/null; then
+            bashio::log.info "FRPC stopped"
+            break
+        fi
         sleep 1
     done
+    # 如果还没退出，直接 kill -9
+    if pgrep -f "frpc -c" >/dev/null; then
+        bashio::log.warning "Force killing FRPC"
+        pkill -9 -f "frpc -c"
+    fi
 fi
-
-touch "$LOCK_FILE"
-
-# 停止旧的 frpc 进程
-bashio::log.info "Stopping any existing frpc process..."
-pkill -f "$FRPC_BIN -c" || true
-sleep 3
 
 # 如果是 watchdog 或 restart 触发，给系统一点缓冲时间
 if [[ "${1:-}" == "restart" ]]; then
