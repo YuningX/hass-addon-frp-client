@@ -3,7 +3,13 @@
 CONFIG_PATH='/share/frpc.toml'
 DEFAULT_CONFIG_PATH='/frpc.toml'
 
-echo "RUN.SH START $(date)" >> /share/run.log
+bashio::log.info "RUN.SH START $(date)"
+
+bashio::log.info "Waiting for previous FRPC connection to close..."
+
+pkill -f "frpc -c" || true
+
+sleep 5
 
 function prepare_config() {
     bashio::log.info "Copying configuration."
