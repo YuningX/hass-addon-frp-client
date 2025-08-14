@@ -15,6 +15,8 @@ function prepare_config() {
     sed -i "s/webServer.user = \"admin\"/webServer.user = \"$(bashio::config 'webServerUser')\"/" $CONFIG_PATH
     sed -i "s/webServer.password = \"123456789\"/webServer.password = \"$(bashio::config 'webServerPassword')\"/" $CONFIG_PATH
     sed -i "s/customDomains = \[\"your_domain\"\]/customDomains = [\"$(bashio::config 'customDomain')\"]/" $CONFIG_PATH
+    UNIQUE_NAME="homeassistant-$(date +%s)"
+    sed -i "s/name = \"your_proxy_name\"/name = \"$UNIQUE_NAME\"/" $CONFIG_PATH
 }
 
 prepare_config
