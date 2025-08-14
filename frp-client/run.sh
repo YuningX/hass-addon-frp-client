@@ -3,6 +3,8 @@
 CONFIG_PATH='/share/frpc.toml'
 DEFAULT_CONFIG_PATH='/frpc.toml'
 
+echo "RUN.SH START $(date)" >> /share/run.log
+
 function prepare_config() {
     bashio::log.info "Copying configuration."
     cp $DEFAULT_CONFIG_PATH $CONFIG_PATH
@@ -13,7 +15,6 @@ function prepare_config() {
     sed -i "s/webServer.user = \"admin\"/webServer.user = \"$(bashio::config 'webServerUser')\"/" $CONFIG_PATH
     sed -i "s/webServer.password = \"123456789\"/webServer.password = \"$(bashio::config 'webServerPassword')\"/" $CONFIG_PATH
     sed -i "s/customDomains = \[\"your_domain\"\]/customDomains = [\"$(bashio::config 'customDomain')\"]/" $CONFIG_PATH
-    sed -i "s/name = \"your_proxy_name\"/name = \"$(bashio::config 'proxyName')\"/" $CONFIG_PATH
 }
 
 prepare_config
